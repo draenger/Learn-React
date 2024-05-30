@@ -1,7 +1,31 @@
+import { useState } from "react";
+
+import Header from "./components/Header";
+import UserInput from "./components/UserInput";
+import Results from "./components/Results";
+
 function App() {
+  const [userInput, setUserInput] = useState({
+    initialInvestment: 15000,
+    annualInvestment: 900,
+    expectedReturn: 6,
+    duration: 10,
+  });
+
+  function handleChange(inputIdentifier, newValue) {
+    console.log(inputIdentifier, newValue);
+    setUserInput((prevUserInput) => {
+      return { ...prevUserInput, [inputIdentifier]: +newValue };
+    });
+  }
+
   return (
-    <h1>React Investment Calculator</h1>
-  )
+    <>
+      <Header />
+      <UserInput userInput={userInput} onChange={handleChange} />
+      <Results userInput={userInput} />
+    </>
+  );
 }
 
-export default App
+export default App;
