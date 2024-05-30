@@ -22,6 +22,8 @@ export function calculateInvestmentResults({
       valueEndOfYear: investmentValue, // investment value at end of year
       annualInvestment: annualInvestment, // investment added in this year
     });
+
+    console.log(annualData);
   }
 
   return annualData;
