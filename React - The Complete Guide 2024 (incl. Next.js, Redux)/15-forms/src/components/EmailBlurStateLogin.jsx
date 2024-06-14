@@ -6,26 +6,38 @@ export default function Login() {
     password: "",
   });
 
+  const [didEdit, setDidEdit] = useState({
+    email: false,
+    password: false,
+  });
+
   function handleSubmit(event) {
     event.preventDefault();
     console.log("User Email: ", credentials.email);
     console.log("User Password: ", credentials.password);
   }
 
-  function handleEmailChange(event) {
+  function handleInputChange(identifier, value) {
     setCredentials((prevValues) => {
       return {
         ...prevValues,
-        email: event.target.value,
+        [identifier]: value,
       };
     });
-  }
 
-  function handlePasswordChange(event) {
-    setCredentials((prevValues) => {
+    setDidEdit((prevValues) => {
       return {
         ...prevValues,
-        password: event.target.value,
+        [identifier]: true,
+      };
+    }
+  }
+
+  function handleInputBlur(identifier) {
+    setDidEdit((prevValues) => {
+      return {
+        ...prevValues,
+        [identifier]: true,
       };
     });
   }
@@ -41,7 +53,8 @@ export default function Login() {
             id="email"
             type="email"
             name="email"
-            onChange={handleEmailChange}
+            onBlur={(event) => handleInputBlur("email")}
+            onChange={(event) => handleInputChange("email", event.target.value)}
             value={credentials.email}
           />
         </div>
@@ -52,7 +65,10 @@ export default function Login() {
             id="password"
             type="password"
             name="password"
-            onChange={handlePasswordChange}
+            onBlur={(event) => handleInputBlur("password")}
+            onChange={(event) =>
+              handleInputChange("password", event.target.value)
+            }
             value={credentials.password}
           />
         </div>
