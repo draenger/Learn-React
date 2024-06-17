@@ -2,9 +2,15 @@ import { useContext } from "react";
 import { CartContext } from "../store/food-cart-context";
 
 export default function Product({ id, image, name, price, description }) {
-  const { addItem } = useContext(CartContext);
+  const { items, addItem, updateItemQuantity } = useContext(CartContext);
 
   function handleAddItemToCart() {
+    const existingItemIndex = items.findIndex((item) => item.id === id);
+    if (existingItemIndex !== -1) {
+      updateItemQuantity(id, 1); // increase amount by 1
+      return;
+    }
+
     addItem({
       id,
       name,

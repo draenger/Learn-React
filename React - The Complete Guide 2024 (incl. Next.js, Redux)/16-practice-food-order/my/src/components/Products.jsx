@@ -6,7 +6,6 @@ import Product from "./Product.jsx";
 export default function Products() {
   const {
     data: meals,
-    setData: setMeals,
     loading: isLoadingMeals,
     error: errorLoadingMeals,
   } = useFetch(fetchMeals, []);

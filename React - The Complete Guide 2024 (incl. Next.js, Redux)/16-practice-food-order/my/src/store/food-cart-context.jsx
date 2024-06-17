@@ -2,61 +2,39 @@ import { createContext, useReducer } from "react";
 
 export const CartContext = createContext({
   items: [],
-  totalAmount: 0,
   addItem: (item) => {},
-  removeItem: (id) => {},
-  updatedItemQuantity: (id, amount) => {},
+  updateItemQuantity: (id, amount) => {},
 });
 
 function cartReducer(state, action) {
-  if (action.type === "ADD_ITEM") {
-    const updatedItems = state.items.concat(action.item);
-
-    const updatedTotalAmount =
-      state.totalAmount + action.item.price * action.item.amount;
-
-    return {
-      items: updatedItems,
-      totalAmount: updatedTotalAmount,
-    };
-  }
-
-  if (action.type === "REMOVE_ITEM") {
-    const itemIndex = state.items.findIndex((item) => item.id === action.id);
-    const item = state.items[itemIndex];
-    const updatedTotalAmount = state.totalAmount - item.price;
-
-    let updatedItems;
-    if (item.amount === 1) {
-      updatedItems = state.items.filter((item) => item.id !== action.id);
-    } else {
-      const updatedItem = { ...item, amount: item.amount - 1 };
-      updatedItems = [...state.items];
-      updatedItems[itemIndex] = updatedItem;
+  switch (action.type) {
+    case "ADD_ITEM": {
+      return {
+        items: state.items.concat(action.item),
+      };
     }
+    case "UPDATE_ITEM_QUANITY": {
+      const updatedItems = state.items.map((item) => {
+        if (item.id === action.id) {
+          const newAmount = item.amount + action.amount;
+          if (newAmount <= 0) {
+            return null; // Remove the item from the array
+          }
+          return {
+            ...item,
+            amount: newAmount,
+          };
+        }
+        return item;
+      });
 
-    return {
-      items: updatedItems,
-      totalAmount: updatedTotalAmount,
-    };
+      return {
+        items: updatedItems.filter((item) => item !== null),
+      };
+    }
+    default:
+      return state;
   }
-
-  if (action.type === "UPDATE_ITEM") {
-    const itemIndex = state.items.findIndex((item) => item.id === action.id);
-    const item = state.items[itemIndex];
-    const updatedTotalAmount = state.totalAmount + item.price * action.amount;
-
-    const updatedItem = { ...item, amount: item.amount + action.amount };
-    const updatedItems = [...state.items];
-    updatedItems[itemIndex] = updatedItem;
-
-    return {
-      items: updatedItems,
-      totalAmount: updatedTotalAmount,
-    };
-  }
-
-  return state;
 }
 
 export default function CartContextProvider(props) {
@@ -69,19 +47,20 @@ export default function CartContextProvider(props) {
     dispatchCartAction({ type: "ADD_ITEM", item });
   }
 
-  function removeItemHandler(id) {
-    dispatchCartAction({ type: "REMOVE_ITEM", id });
+  function updateItemQuantityHandler(id, amount) {
+    dispatchCartAction({ type: "UPDATE_ITEM_QUANITY", id, amount });
   }
 
-  function updateItemQuantityHandler(id, amount) {
-    dispatchCartAction({ type: "UPDATE_ITEM", id, amount });
+  function calculateTotalAmount() {
+    return cartState.items
+      .reduce((acc, item) => acc + item.price * item.amount, 0)
+      .toFixed(2);
   }
 
   const cartContext = {
     items: cartState.items,
-    totalAmount: cartState.totalAmount,
+    calculateTotalAmount: calculateTotalAmount,
     addItem: addItemHandler,
-    removeItem: removeItemHandler,
     updateItemQuantity: updateItemQuantityHandler,
   };
 
